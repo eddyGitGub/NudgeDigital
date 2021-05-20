@@ -21,6 +21,7 @@ namespace NudgeDigital.Application.Features.Laptops.Query
         {
             var reponse = await _dbContext.Laptops.Include(b=>b.Brand).Include(x=>x.Configurations).ThenInclude(y=>y.Configuration).AsNoTracking().ToListAsync(cancellationToken: cancellationToken);
             var data = _mapper.Map<List<LaptopVM>>(reponse);
+            
 
             return data;
         }

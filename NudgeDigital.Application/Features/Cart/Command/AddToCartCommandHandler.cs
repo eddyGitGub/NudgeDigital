@@ -27,12 +27,19 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Command
             {
                 sessionId = Guid.NewGuid().ToString();
             }
-
+            var unitPrice = 0M;
+            var getLaptop = await _dbcontext.Laptops.Include(b => b.Brand).Include(x => x.Configurations).ThenInclude(y => y.Configuration).Where(x => x.Id == request.ItemId).AsNoTracking().ToListAsync(cancellationToken: cancellationToken);
+            
+            if (getLaptop.Any())
+            {
+                unitPrice = getLaptop[0].Brand.Price + getLaptop[0].Configurations.Sum(x => x.Configuration.Price);
+            }
+           
             var item = await _dbcontext.Carts.AsNoTracking().FirstOrDefaultAsync(x => x.LaptopId == request.ItemId && x.SessionId == sessionId);
             if (item != null)
             {
                 item.SessionId = sessionId;
-                item.UnitPrice = request.UnitPrice;
+                item.UnitPrice = unitPrice;
                 item.Quantity = request.Quantity;
                 item.TotalAmount = item.UnitPrice * item.Quantity;
                 _dbcontext.Carts.Update(item);
@@ -47,14 +54,14 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Command
                     LaptopId = request.ItemId,
                     SessionId = sessionId,
                     Quantity = request.Quantity,
-                    UnitPrice = request.UnitPrice,
-                    Date = request.Date
+                    UnitPrice = unitPrice,
+                    Date = DateTime.Now
                 };
 
                 model.TotalAmount = model.UnitPrice * model.Quantity;
                 _dbcontext.Carts.Add(model);
                 await _dbcontext.SaveChangesAsync();
-                return ResponseModel.Success("Added to Cart");
+                return ResponseModel<string>.Success(sessionId,"Added to Cart");
             }
         }
     }

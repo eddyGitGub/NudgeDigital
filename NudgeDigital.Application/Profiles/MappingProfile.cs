@@ -38,6 +38,7 @@ namespace NudgeDigital.Application.Profiles
             CreateMap<ShoppingBasket, CartVM>()
                  .ForMember(x => x.ItemId, m => m.MapFrom(y => y.LaptopId))
                  .ForMember(x => x.ItemName, m => m.MapFrom(y => y.Laptop.Name))
+                  .ForMember(x => x.Configurations, m => m.MapFrom(y => y.Laptop.Configurations.Select(s => s.Configuration.ComponentType)))
                 .ReverseMap();
 
         }

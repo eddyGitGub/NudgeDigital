@@ -37,8 +37,8 @@ namespace NudgeDigital.Api.Controllers
         [ProducesResponseType(typeof(ResponseModel), (int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType(typeof(List<CartVM>), (int)HttpStatusCode.OK)]
         [Produces("application/json")]
-        [HttpGet("GetByUser/{userId}")]
-        public async Task<IActionResult> GetByUser([FromRoute] string sessionId)
+        [HttpGet("GetBySession/{sessionId}")]
+        public async Task<IActionResult> GetBySession([FromRoute] string sessionId)
         {
             var res = await Mediator.Send(new GetCartQuery(sessionId));
 
