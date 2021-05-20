@@ -30,64 +30,29 @@ namespace NudgeDigital.Application.Features.Laptops.Command
             }
 
             var configIds = request.ConfigItems.Distinct().ToList();
+            var duplicateComponents = await _context.Configurations.AsNoTracking().Where(x => configIds.Contains(x.Id)).Include(x => x.Component)
+                .GroupBy(x => x.Component).Where(g => g.Count() > 1).Select(y => y.Key).ToListAsync();
 
-            // Do this to check if a laptop for the same configurations already exists
-            //var existingComponent = await _context.Laptops.AsNoTracking()
-            //    .AnyAsync(c => c.Name.ToLower().Equals(request.Name.ToLower())
-            //    || c.BrandId == request.BrandId &&
-            //    c.Configurations.GroupBy(x => new { x.ConfigurationId, x.Configuration.ComponentId })
-            //    .Where(x => x.Skip(1).Any())
-            //    .Any(x => configIds.Contains(x.Key.ConfigurationId)));
-
-            //But for user experience, return the list the list of affected components / configurations
-            //var configurations = await _context.Configurations.AsNoTracking().Where(x => configIds.Contains(x.Id)).ToListAsync();
-
-            var getType = await _context.Configurations.AsNoTracking().Where(x => configIds.Contains(x.Id)).Select(s => s.ComponentId).ToListAsync();
-            var check = getType.GroupBy(x => x).Any(g => g.Count() > 1);
-            if (check)
+            if (duplicateComponents.Count > 0)
             {
-                //return ResponseModel.Failure($"Laptop with the name {request.Name} or the same configurations already exists");
-                return new ResponseModel<List<LaptopConfigError>>()
-                {
-                    Message = "components of same type not allow",
-                   // Data = 
-                };
-
+                var items = string.Join(",", duplicateComponents.Select(x => x.Name));
+                return ResponseModel.Failure($"You have selected duplicate components: {items}.");
             }
 
-            var existingComponents = await _context.Laptops.AsNoTracking()
-                .Where(x => x.BrandId == request.BrandId && x.Configurations.Any(x => configIds.Contains(x.ConfigurationId)))
-                .Include(x => x.Configurations).ThenInclude(x => x.Configuration).ThenInclude(x => x.Component)
-                .SelectMany(x => x.Configurations.Select(x => new LaptopConfigError()
-                {
-                    ConfigurationId = x.ConfigurationId,
-                    ComponentName = $"{x.Configuration.Component.Name} - {x.Configuration.ComponentType}"
-                })).ToListAsync();
+            var productExist = await _context.Laptops.AsNoTracking().Where(x => x.BrandId == request.BrandId && x.Configurations.Any(c => configIds.All(x => c.ConfigurationId == x))).AnyAsync();
 
-            if (existingComponents.Count > 0)
+            if (productExist)
             {
-                //return ResponseModel.Failure($"Laptop with the name {request.Name} or the same configurations already exists");
-                return new ResponseModel<List<LaptopConfigError>>()
-                {
-                    Message = "There is an existing laptop with the selected components",
-                    Data = existingComponents
-                };
-
-                //var checkConfig = await _context.LaptopConfigurations.AsNoTracking().GroupBy(x => new { x.ConfigurationId, x.Configuration.ComponentId }).AnyAsync(x => x.);
-                //var hasDupes = dupList.GroupBy(x => new { x.checkThis, x.checkThat })
-                //   .Where(x => x.Skip(1).Any()).Any();
-                //var exist1 = await _context.Laptops.AsNoTracking().AnyAsync(c => c.Name.ToLower().Equals(request.Name.ToLower()) || c.BrandId == request.BrandId && c.Configurations.Any(x => configIds.Contains(x.ConfigurationId)));
+                return ResponseModel.Failure($"Laptop with the same brand and configurations already exists");
             }
+
             var model = _mapper.Map<Laptop>(request);
             var configs = new List<Domain.Entities.LaptopConfiguration>();
             foreach (var item in configIds)
             {
                 configs.Add(new Domain.Entities.LaptopConfiguration { ConfigurationId = item });
             }
-            //for (int i = 0; i < configIds.Count; i++)
-            //{
-                
-            //}
+            
 
             model.Configurations = configs;
             await _context.Laptops.AddAsync(model, cancellationToken);

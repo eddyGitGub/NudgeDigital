@@ -10,7 +10,7 @@ namespace NudgeDigital.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LapTopsController : BaseController
+    public class LaptopsController : BaseController
     {
         [ProducesResponseType(typeof(ResponseModel), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ResponseModel), (int)HttpStatusCode.OK)]
