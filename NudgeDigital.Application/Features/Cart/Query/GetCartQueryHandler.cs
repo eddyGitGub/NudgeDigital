@@ -24,7 +24,7 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Query
         public async Task<List<CartVM>> Handle(GetCartQuery request, CancellationToken cancellationToken)
         {
            
-            var response = await _dbContext.Carts.AsNoTracking().Where(x=>x.SessionId == request.SessionId).ToListAsync();
+            var response = await _dbContext.Carts.Include(x=> x.Laptop).AsNoTracking().Where(x=>x.SessionId == request.SessionId).ToListAsync();
             var data = _mapper.Map<List<CartVM>>(response);
 
             return data;

@@ -11,5 +11,6 @@ namespace NudgeDigital.Application.Features.Brands.Command
     public class CreateBrandCommand:IRequest<ResponseModel>
     {
         public string Name { get; set; }
+        public decimal Price { get; set; }
     }
 }

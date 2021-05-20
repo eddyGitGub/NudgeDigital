@@ -9,16 +9,12 @@ namespace NudgeDigital.Application.Features.Laptops.Command
         public int BrandId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
+       // public decimal Price { get; set; }
 
         public virtual List<int> ConfigItems { get; set; }
     }
 
-    //public class LaptopConfigRequest
-    //{
-    //    public int ComponentId { get; set; }
-    //    public int ConfigurationId { get; set; }
-    //}
+   
 
     public class LaptopConfigError
     {

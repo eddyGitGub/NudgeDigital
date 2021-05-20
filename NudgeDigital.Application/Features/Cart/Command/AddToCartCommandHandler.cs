@@ -21,14 +21,14 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Command
 
         public async Task<ResponseModel> Handle(AddToCartCommand request, CancellationToken cancellationToken)
         {
-            var sessionId = await _dbcontext.Carts.AsNoTracking().Where(x => x.ProductId == request.ItemId).Select(x => x.SessionId).FirstOrDefaultAsync();
+            var sessionId = await _dbcontext.Carts.AsNoTracking().Where(x => x.LaptopId == request.ItemId).Select(x => x.SessionId).FirstOrDefaultAsync();
 
             if (string.IsNullOrEmpty(sessionId))
             {
                 sessionId = Guid.NewGuid().ToString();
             }
 
-            var item = await _dbcontext.Carts.AsNoTracking().FirstOrDefaultAsync(x => x.ProductId == request.ItemId && x.SessionId == sessionId);
+            var item = await _dbcontext.Carts.AsNoTracking().FirstOrDefaultAsync(x => x.LaptopId == request.ItemId && x.SessionId == sessionId);
             if (item != null)
             {
                 item.SessionId = sessionId;
@@ -43,8 +43,8 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Command
             {
                 var model = new ShoppingBasket()
                 {
-                   
-                    ProductId = request.ItemId,
+
+                    LaptopId = request.ItemId,
                     SessionId = sessionId,
                     Quantity = request.Quantity,
                     UnitPrice = request.UnitPrice,

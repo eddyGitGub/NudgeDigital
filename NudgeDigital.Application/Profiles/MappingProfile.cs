@@ -8,6 +8,7 @@ using NudgeDigital.Domain.Entities;
 using NudgeDigital.Application.Features.Brands.Queries;
 using NudgeDigital.Application.Features.Components.Queries;
 using System.Linq;
+using NudgeDigital.Application.Features.LaptopConfiguration.Query;
 
 namespace NudgeDigital.Application.Profiles
 {
@@ -26,12 +27,18 @@ namespace NudgeDigital.Application.Profiles
             CreateMap<Laptop, LaptopVM>()
                  .ForMember(x => x.Configurations, m => m.MapFrom(y => y.Configurations.Select(s=> s.Configuration.ComponentType)))
                  .ForMember(x => x.Brand, m => m.MapFrom(y => y.Brand.Name))
-                 .ForMember(x => x.PriceTotal, m => m.MapFrom(y => y.Price + y.Configurations.Sum(s => s.Configuration.Price)))
+                 .ForMember(x => x.Price, m => m.MapFrom(y => y.Brand.Price + y.Configurations.Sum(s => s.Configuration.Price)))
                 .ReverseMap();
 
             CreateMap<CreateLaptopConfigurationCommand, LaptopConfiguration>().ReverseMap();
             CreateMap<Brand, BrandVM>().ReverseMap();
             CreateMap<Component, ComponentVM>().ReverseMap();
+
+
+            CreateMap<ShoppingBasket, CartVM>()
+                 .ForMember(x => x.ItemId, m => m.MapFrom(y => y.LaptopId))
+                 .ForMember(x => x.ItemName, m => m.MapFrom(y => y.Laptop.Name))
+                .ReverseMap();
 
         }
     }

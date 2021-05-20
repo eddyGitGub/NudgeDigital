@@ -76,31 +76,41 @@ namespace NudgeDigital.Persistence.Extensions
                      new Brand
                      {
                          Id=1,
-                        Name = "Dell"
+                        Name = "Dell",
+                        Price= 349.87M
+
 
 
                      }, new Brand
                      {
                          Id=2,
-                         Name= "Toshiba"
+                         Name= "Toshiba",
+                         Price = 345.67M
 
 
                      }, new Brand
                      {
                          Id=3,
-                         Name = "HP"
+                         Name = "HP",
+                         Price = 456.76M
 
 
-                     }, new Brand
+
+                     }, 
+                     new Brand
                      {
                          Id=4,
-                        Name="Apple"
+                        Name="Apple",
+                        Price= 649.87M
+
 
 
                      }
                     );
 
             }
+
+
             context.SaveChanges();
         }
     }

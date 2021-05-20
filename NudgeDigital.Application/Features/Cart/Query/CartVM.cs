@@ -5,7 +5,6 @@ namespace NudgeDigital.Application.Features.LaptopConfiguration.Query
 {
     public class CartVM: AuditableEntity
     {
-        public int? UserId { get; set; }
         public int ItemId { get; set; }
         public string ItemName { get; set; }
         public decimal UnitPrice { get; set; }
